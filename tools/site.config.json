@@ -1,0 +1,14 @@
+{
+  "name": "United Cleaning Services",
+  "domain": "https://unitedcleaning.us",
+  "phone_display": "(800) 555-0142",
+  "phone_tel": "+18005550142",
+  "whatsapp": "18005550142",
+  "email": "Info@unitedcleaning.us",
+  "areas_en": "Missouri, Kansas & Southern Illinois",
+  "areas_es": "Missouri, Kansas y el sur de Illinois",
+  "colors": {
+    "navy": "#0f1d2f", "navy2": "#162841", "teal": "#0e6468", "teal_dark": "#0a5155",
+    "accent": "#ff7a45", "accent_dark": "#f2652b", "cyan": "#2fb4d6", "green": "#5fd88a", "blue": "#1f6fb2"
+  }
+}
