@@ -9,6 +9,9 @@ BASE=C['domain']; PH=C['phone_display']; TEL=C['phone_tel']; EM=C['email']; WA=C
 K=C['colors']
 open(f'{ROOT}/theme.css','w').write(f":root{{--navy:{K['navy']};--navy2:{K['navy2']};--ink:#1d2836;--muted:#5d6a78;--line:#e1e6ec;--bg:#f4f7fa;--teal:{K['teal']};--teal-d:{K['teal_dark']};--accent:{K['accent']};--accent-d:{K['accent_dark']};--cyan:{K['cyan']};--green:{K['green']};--blue:{K['blue']};--r:14px}}\n")
 
+import hashlib
+def _v(f): return hashlib.md5(open(os.path.join(ROOT,f),'rb').read()).hexdigest()[:8]
+VER={f:_v(f) for f in ('styles.css','main.js')}
 def write(path,html):
     d=os.path.join(ROOT,path.strip('/'));os.makedirs(d,exist_ok=True)
     open(os.path.join(d,'index.html'),'w').write(html)
@@ -29,6 +32,7 @@ def ic(n):
 
 WA_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1112 20.200zm4.500-6.100c-.2-.1-1.500-.7-1.700-.8s-.4-.1-.6.100-.6.800-.8 1-.3.200-.6.100a6.700 6.700 0 01-3.300-2.900c-.2-.4.200-.4.700-1.300.1-.2 0-.3 0-.5l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.300 3 3 0 00-.9 2.200c0 1.300.9 2.600 1 2.800.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.7 3.100.6.500-.1 1.500-.6 1.700-1.200s.2-1.100.2-1.200-.2-.2-.5-.3z"/></svg>'
 
+THEMEV=hashlib.md5(open(f'{ROOT}/theme.css','rb').read()).hexdigest()[:8]
 def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jpg'):
     t=T[lang]; url=BASE+path
     sv_links=''.join(f'<li><a href="{u(lang,"sv",s)}">{L(lang,s["n"])}</a></li>' for s in SERVICES)
@@ -52,7 +56,7 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
 <meta property="og:type" content="website"><meta property="og:site_name" content="{C['name']}"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}{ogimg}"><meta property="og:locale" content="{'en_US' if lang=='en' else 'es_US'}"><meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/theme.css"><link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/theme.css?v={THEMEV}"><link rel="stylesheet" href="/styles.css?v={VER["styles.css"]}">
 <script type="application/ld+json">{ld}</script>{ld_extra}
 </head>
 <body>
@@ -73,7 +77,7 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
 </div></footer>
 <a class="wa" href="https://wa.me/{WA}" target="_blank" rel="noopener" aria-label="{t['wa']}">{WA_SVG}</a>
 <div class="mbar"><a class="c" href="tel:{TEL}">{t['call']}</a><a class="q" href="{q}">{t['q_s']}</a></div>
-<script src="/main.js" defer></script>
+<script src="/main.js?v={VER["main.js"]}" defer></script>
 </body></html>'''
 
 # ---- shared blocks
