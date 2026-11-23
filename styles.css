@@ -206,3 +206,5 @@ a.card .go{display:inline-block;margin-top:14px;font-weight:600;font-size:14px;c
 .ocard:hover{border-color:var(--teal);color:var(--teal)}.ocard:hover i{transform:translateX(4px)}
 .cta{position:relative}
 .dark .step{background:var(--navy2)}
+.prose{max-width:780px}.prose h2{font-size:22px;margin:34px 0 10px}.prose h2:first-child{margin-top:0}.prose p{color:#3a4756;font-size:16.5px;margin:0 0 6px}.prose .note{margin-top:40px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.fb .legal{display:flex;gap:20px}.fb .legal a{color:#7f93a8;font-size:13px}.fb .legal a:hover{color:#fff}

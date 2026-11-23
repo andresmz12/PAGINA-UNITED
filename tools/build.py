@@ -4,6 +4,9 @@ import os, json, sys
 HERE=os.path.dirname(os.path.abspath(__file__)); ROOT=os.path.dirname(HERE)
 sys.path.insert(0,HERE)
 from content import SERVICES
+from legal import PRIVACY,TERMS,UPDATED
+import datetime
+TODAY=datetime.date.today().isoformat()
 C=json.load(open(os.path.join(HERE,'site.config.json')))
 BASE=C['domain']; PH=C['phone_display']; TEL=C['phone_tel']; EM=C['email']; WA=C['whatsapp']
 K=C['colors']
@@ -18,13 +21,15 @@ def write(path,html):
 
 # ---- URL helpers
 def u(lang,kind,sv=None):
+    if kind in('privacy','terms'):
+        return {('en','privacy'):'/privacy/',('en','terms'):'/terms/',('es','privacy'):'/es/privacidad/',('es','terms'):'/es/terminos/'}[(lang,kind)]
     if lang=='en':
         return {'home':'/','services':'/services/','about':'/about/','contact':'/contact/','sv':f'/services/{sv["en"]}/' if sv else ''}[kind]
     return {'home':'/es/','services':'/es/servicios/','about':'/es/nosotros/','contact':'/es/contacto/','sv':f'/es/servicios/{sv["es"]}/' if sv else ''}[kind]
 def L(lang,i): return i[0] if lang=='en' else i[1]
 
-T={'en':dict(home='Home',services='Services',about='About',contact='Contact',quote='Get a Free Quote',foot='Commercial and residential cleaning across Missouri, Kansas & Southern Illinois.',co='COMPANY',ct='CONTACT',avail='Available 24/7',area=C['areas_en'],rights='© 2026 United Cleaning Services. All rights reserved.',call='Call',q_s='Free Quote',other='ES',olabel='Español',svc='SERVICES',wa='Chat on WhatsApp'),
-   'es':dict(home='Inicio',services='Servicios',about='Nosotros',contact='Contacto',quote='Cotización Gratis',foot='Limpieza comercial y residencial en Missouri, Kansas y el sur de Illinois.',co='EMPRESA',ct='CONTACTO',avail='Disponible 24/7',area=C['areas_es'],rights='© 2026 United Cleaning Services. Todos los derechos reservados.',call='Llamar',q_s='Cotizar',other='EN',olabel='English',svc='SERVICIOS',wa='Escríbanos por WhatsApp')}
+T={'en':dict(home='Home',services='Services',about='About',contact='Contact',quote='Get a Free Quote',foot='Commercial and residential cleaning across Missouri, Kansas & Southern Illinois.',co='COMPANY',ct='CONTACT',avail='Available 24/7',area=C['areas_en'],rights='© 2026 United Cleaning Services. All rights reserved.',call='Call',q_s='Free Quote',other='ES',olabel='Español',svc='SERVICES',wa='Chat on WhatsApp',priv='Privacy Policy',terms='Terms of Use'),
+   'es':dict(home='Inicio',services='Servicios',about='Nosotros',contact='Contacto',quote='Cotización Gratis',foot='Limpieza comercial y residencial en Missouri, Kansas y el sur de Illinois.',co='EMPRESA',ct='CONTACTO',avail='Disponible 24/7',area=C['areas_es'],rights='© 2026 United Cleaning Services. Todos los derechos reservados.',call='Llamar',q_s='Cotizar',other='EN',olabel='English',svc='SERVICIOS',wa='Escríbanos por WhatsApp',priv='Privacidad',terms='Términos de Uso')}
 
 def ic(n):
     p={'clock':'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>','shield':'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>','star':'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>'}[n]
@@ -36,7 +41,7 @@ THEMEV=hashlib.md5(open(f'{ROOT}/theme.css','rb').read()).hexdigest()[:8]
 FLAGS={
 'es':'<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#c60b1e"/><rect y="5" width="30" height="10" fill="#ffc400"/></svg>',
 'en':'<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/>'+''.join(f'<rect y="{y*20/7.0:.2f}" width="30" height="{20/13.0:.2f}" fill="#b22234"/>' for y in [0,1.9,3.8,5.7,7.6,9.5,11.4] if False)+''.join(f'<rect y="{k*20/13:.2f}" width="30" height="{20/13:.2f}" fill="#b22234"/>' for k in range(0,13,2))+'<rect width="13" height="10.77" fill="#3c3b6e"/></svg>'}
-def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jpg'):
+def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jpg',robots='index,follow,max-image-preview:large'):
     t=T[lang]; url=BASE+path
     sv_links=''.join(f'<li><a href="{u(lang,"sv",s)}">{L(lang,s["n"])}</a></li>' for s in SERVICES)
     def cls(p): return ' class="on"' if (path==p or (p not in('/','/es/') and path.startswith(p))) else ''
@@ -46,18 +51,19 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
     flat=''.join(f'<a href="{h}">{n}</a>' for h,n in [(u(lang,'home'),t['home']),(u(lang,'services'),t['services']),(u(lang,'about'),t['about']),(u(lang,'contact'),t['contact'])])
     en_p,es_p=(path,alt) if lang=='en' else (alt,path)
     hl=f'<link rel="alternate" hreflang="en" href="{BASE}{en_p}"><link rel="alternate" hreflang="es" href="{BASE}{es_p}"><link rel="alternate" hreflang="x-default" href="{BASE}{en_p}">'
-    ld=json.dumps({"@context":"https://schema.org","@type":"CleaningService","name":C['name'],"image":BASE+"/assets/logo.jpg","url":BASE+"/","telephone":TEL,"email":EM,"areaServed":["Missouri","Kansas","Southern Illinois"],"openingHours":"Mo-Su 00:00-24:00","priceRange":"$$"})
+    ld=json.dumps({"@context":"https://schema.org","@type":["CleaningService","LocalBusiness"],"@id":BASE+"/#business","name":C['name'],"image":BASE+"/assets/office-team.jpg","logo":BASE+"/assets/logo.jpg","url":BASE+"/","telephone":TEL,"email":EM,"priceRange":"$$","areaServed":[{"@type":"State","name":"Missouri"},{"@type":"State","name":"Kansas"},{"@type":"AdministrativeArea","name":"Southern Illinois"}],"openingHoursSpecification":{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],"opens":"00:00","closes":"23:59"},"contactPoint":{"@type":"ContactPoint","telephone":TEL,"email":EM,"contactType":"customer service","availableLanguage":["English","Spanish"]},"knowsLanguage":["en","es"]},ensure_ascii=False)
     q=u(lang,'contact'); home=u(lang,'home')
+    PRELOAD='<link rel="preload" as="image" href="/assets/office-team.jpg" fetchpriority="high">' if path in('/','/es/') else ''
     return f'''<!DOCTYPE html>
 <html lang="{lang}">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title>
-<meta name="description" content="{desc}">
+<meta name="description" content="{desc}"><meta name="robots" content="{robots}">
 <link rel="canonical" href="{url}">{hl}
 <link rel="icon" type="image/png" href="/assets/favicon.png"><meta name="theme-color" content="{K['navy']}">
-<meta property="og:type" content="website"><meta property="og:site_name" content="{C['name']}"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}{ogimg}"><meta property="og:locale" content="{'en_US' if lang=='en' else 'es_US'}"><meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta property="og:type" content="website"><meta property="og:site_name" content="{C['name']}"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}"><meta property="og:url" content="{url}"><meta property="og:image" content="{BASE}{ogimg}"><meta property="og:locale" content="{'en_US' if lang=='en' else 'es_US'}"><meta property="og:locale:alternate" content="{'es_US' if lang=='en' else 'en_US'}"><meta property="og:image:alt" content="{C['name']}"><meta name="twitter:card" content="summary_large_image">
+{PRELOAD}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/theme.css?v={THEMEV}"><link rel="stylesheet" href="/styles.css?v={VER["styles.css"]}">
 <script type="application/ld+json">{ld}</script>{ld_extra}
@@ -76,7 +82,7 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
 <div><h4>{t['svc']}</h4>{''.join(f'<a href="{u(lang,"sv",s)}">{L(lang,s["n"])}</a>' for s in SERVICES)}</div>
 <div><h4>{t['ct']}</h4><a href="tel:{TEL}">{PH}</a><a href="mailto:{EM}">{EM}</a><span>{t['avail']}</span><span>{t['area']}</span></div>
 </div>
-<div class="fb"><span>{t['rights']}</span><a href="{alt}" style="color:#7f93a8;display:flex;align-items:center;gap:8px"><span class="flag">{FLAGS['es' if lang=='en' else 'en']}</span>{t['olabel']}</a></div>
+<div class="fb"><span>{t['rights']}</span><span class="legal"><a href="{u(lang,'privacy')}">{t['priv']}</a><a href="{u(lang,'terms')}">{t['terms']}</a></span><a href="{alt}" style="color:#7f93a8;display:flex;align-items:center;gap:8px"><span class="flag">{FLAGS['es' if lang=='en' else 'en']}</span>{t['olabel']}</a></div>
 </div></footer>
 <a class="wa" href="https://wa.me/{WA}" target="_blank" rel="noopener" aria-label="{t['wa']}">{WA_SVG}</a>
 <div class="mbar"><a class="c" href="tel:{TEL}">{t['call']}</a><a class="q" href="{q}">{t['q_s']}</a></div>
@@ -164,7 +170,9 @@ def sv_page(lang,s):
 <aside class="side"><h3>{tx("Get a free quote","Pida su cotización gratis",lang)}</h3><p>{tx("Tell us about your space. We reply within one business day.","Cuéntenos sobre su espacio. Respondemos en un día hábil.",lang)}</p><a class="btn btn-g" href="{qlink}">{T[lang]['quote']}</a><p style="margin:16px 0 0;text-align:center">{tx("or call","o llame",lang)} <a href="tel:{TEL}"><strong>{PH}</strong></a></p></aside></div></section>
 <section class="sec alt"><div class="wrap"><p class="eyebrow">{tx("Explore","Explore",lang)}</p><h2 style="margin-bottom:30px">{tx("Other services","Otros servicios",lang)}</h2><div class="ogrid">{others}</div></div></section>
 {cta(lang,"Ready to get started?","¿Listo para empezar?","A free quote is one short form away.","Una cotización gratis está a un formulario de distancia.")}'''
-    return body,faq_ld(faq)
+    bc=json.dumps({"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":T[lang]['home'],"item":BASE+u(lang,'home')},{"@type":"ListItem","position":2,"name":T[lang]['services'],"item":BASE+u(lang,'services')},{"@type":"ListItem","position":3,"name":name,"item":BASE+u(lang,'sv',s)}]},ensure_ascii=False)
+    sch=json.dumps({"@context":"https://schema.org","@type":"Service","name":name,"description":s['intro'][i],"serviceType":s['n'][0],"provider":{"@id":BASE+"/#business"},"areaServed":["Missouri","Kansas","Southern Illinois"],"url":BASE+u(lang,'sv',s),"availableLanguage":["English","Spanish"]},ensure_ascii=False)
+    return body,faq_ld(faq)+f'<script type="application/ld+json">{bc}</script><script type="application/ld+json">{sch}</script>'
 
 def services_index(lang):
     return f'''{phead(lang,tx("Our services","Nuestros servicios",lang),tx("Cleaning services for every property type","Servicios de limpieza para todo tipo de propiedad",lang),tx("We adjust our crews, schedule, and equipment to match the demands of the space — from corporate offices to family homes.","Ajustamos equipos, horarios y equipo de trabajo a las necesidades de cada espacio — desde oficinas corporativas hasta hogares.",lang),'','office-team')}
@@ -218,23 +226,37 @@ def emit(lang,path,alt,title,desc,body,ld='',img='/assets/office-team.jpg'):
 for lang in('en','es'):
     other='es' if lang=='en' else 'en'
     b,ld=home(lang)
+    ld+=f'<script type="application/ld+json">{json.dumps({"@context":"https://schema.org","@type":"WebSite","name":C["name"],"url":BASE+u(lang,"home"),"inLanguage":lang})}</script>'
     emit(lang,u(lang,'home'),u(other,'home'),
-        'United Cleaning Services | Commercial & Residential Cleaning in Missouri, Kansas & Southern Illinois' if lang=='en' else 'United Cleaning Services | Limpieza Comercial y Residencial en Missouri, Kansas y el Sur de Illinois',
-        'United Cleaning Services provides commercial and residential cleaning across Missouri, Kansas & Southern Illinois with trained, vetted staff available 24/7. Get a free quote today.' if lang=='en' else 'Limpieza comercial y residencial en Missouri, Kansas y el sur de Illinois con personal capacitado y verificado, disponible 24/7. Solicite una cotización gratis.',b,ld)
+        'Commercial & Residential Cleaning Services | United Cleaning' if lang=='en' else 'Limpieza Comercial y Residencial | United Cleaning Services',
+        'Commercial and residential cleaning in Missouri, Kansas & Southern Illinois. Trained, background-checked crews available 24/7. Free quote within one business day.' if lang=='en' else 'Limpieza comercial y residencial en Missouri, Kansas y el sur de Illinois. Personal capacitado y verificado, disponible 24/7. Cotización gratis en un día hábil.',b,ld)
     emit(lang,u(lang,'services'),u(other,'services'),
-        'Cleaning Services | Office, Industrial, Retail & More — United Cleaning Services' if lang=='en' else 'Servicios de Limpieza | Oficinas, Industrial, Tiendas y Más — United Cleaning Services',
+        'Cleaning Services: Office, Industrial, Retail & Home | United Cleaning' if lang=='en' else 'Servicios de Limpieza: Oficinas, Industrial, Tiendas | United Cleaning',
         'Commercial and residential cleaning services: office, industrial, retail, healthcare, post-construction, schools, residential, and floor & carpet care.' if lang=='en' else 'Servicios de limpieza comercial y residencial: oficinas, industrial, tiendas, clínicas, post-construcción, escuelas, residencial y pisos y alfombras.',services_index(lang))
     emit(lang,u(lang,'about'),u(other,'about'),'About Us | United Cleaning Services' if lang=='en' else 'Nosotros | United Cleaning Services',
         'United Cleaning Services cleans offices, industrial facilities, retail stores, schools, healthcare spaces, and homes with trained, vetted staff.' if lang=='en' else 'United Cleaning Services limpia oficinas, instalaciones industriales, tiendas, escuelas, centros de salud y hogares con personal capacitado y verificado.',about(lang),img='/assets/office-team.jpg')
-    emit(lang,u(lang,'contact'),u(other,'contact'),'Contact Us | Get a Free Cleaning Quote — United Cleaning Services' if lang=='en' else 'Contacto | Cotización Gratis de Limpieza — United Cleaning Services',
+    emit(lang,u(lang,'contact'),u(other,'contact'),'Contact Us – Free Cleaning Quote | United Cleaning' if lang=='en' else 'Contacto – Cotización Gratis de Limpieza | United Cleaning',
         f'Request a free quote for commercial or residential cleaning. Call {PH} or fill out our form — available 24/7.' if lang=='en' else f'Solicite una cotización gratis de limpieza comercial o residencial. Llame al {PH} o use nuestro formulario — disponible 24/7.',contact(lang))
     for s in SERVICES:
         b,ld=sv_page(lang,s); i=0 if lang=='en' else 1
-        emit(lang,u(lang,'sv',s),u(other,'sv',s),f'{s["n"][i]} | United Cleaning Services',s['s'][i]+(' Free quote within one business day.' if lang=='en' else ' Cotización gratis en un día hábil.'),b,ld)
+        emit(lang,u(lang,'sv',s),u(other,'sv',s),f'{s["n"][i]} | United Cleaning Services',(lambda base,suf:(base+suf) if len(base+suf)<=158 else base)(s['s'][i],(' Missouri, Kansas & S. Illinois. Free quote.' if lang=='en' else ' MO, KS y sur de IL. Cotización gratis.')),b,ld)
 
+def legal(lang,data):
+    title,secs=data[lang]
+    d=UPDATED[0 if lang=='en' else 1]
+    body=phead(lang,tx('Legal','Legal',lang),title,tx('Last updated','Última actualización',lang)+': '+d)+'<section class="sec"><div class="wrap prose">'+''.join(f'<h2>{h}</h2><p>{t}</p>' for h,t in secs)+f'<p class="note">{tx("This page is a general template and not legal advice.","Esta página es una plantilla general y no constituye asesoría legal.",lang)}</p></div></section>'
+    return title,body
+for lang in('en','es'):
+    other='es' if lang=='en' else 'en'
+    for kind,data in(('privacy',PRIVACY),('terms',TERMS)):
+        ti,b=legal(lang,data)
+        emit(lang,u(lang,kind),u(other,kind),f'{ti} | United Cleaning Services',(f'{ti} for unitedcleaning.us — how we handle your information and the terms for using our website.' if lang=='en' else f'{ti} de unitedcleaning.us — cómo tratamos su información y los términos de uso del sitio.'),b)
+nf=page('en','/404.html','/es/','Page not found | United Cleaning Services','The page you are looking for could not be found.',phead('en','404','Page not found','The page you are looking for does not exist or has moved.',btn='<div class="btns" style="margin-top:28px"><a class="btn btn-g" href="/">Go to home</a><a class="btn btn-o" href="/services/">Our services</a></div>'),robots='noindex,follow')
+open(f'{ROOT}/404.html','w').write(nf)
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
 for p,a,lang in pairs:
     en,es=(p,a) if lang=='en' else (a,p)
-    sm+=f'<url><loc>{BASE}{p}</loc><xhtml:link rel="alternate" hreflang="en" href="{BASE}{en}"/><xhtml:link rel="alternate" hreflang="es" href="{BASE}{es}"/><priority>{1.0 if p in("/","/es/") else 0.7}</priority></url>\n'
+    sm+=f'<url><loc>{BASE}{p}</loc><xhtml:link rel="alternate" hreflang="en" href="{BASE}{en}"/><xhtml:link rel="alternate" hreflang="es" href="{BASE}{es}"/><lastmod>{TODAY}</lastmod><changefreq>monthly</changefreq><priority>{1.0 if p in("/","/es/") else (0.3 if any(k in p for k in ("privacy","terms","privacidad","terminos")) else 0.7)}</priority></url>\n'
+open(f'{ROOT}/robots.txt','w').write(f'User-agent: *\nAllow: /\n\nSitemap: {BASE}/sitemap.xml\n')
 open(f'{ROOT}/sitemap.xml','w').write(sm+'</urlset>\n')
 print(len(pairs),'pages')
