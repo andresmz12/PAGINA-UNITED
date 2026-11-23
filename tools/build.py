@@ -138,8 +138,10 @@ def home(lang):
 {cta(lang,"Request a free quote","Solicite una cotización gratis","Tell us about your space and we'll send a customized quote within one business day.","Cuéntenos sobre su espacio y le enviamos una cotización personalizada en un día hábil.")}'''
     return body,faq_ld(gf)
 
-def phead(lang,eyebrow,h1,sub='',crumbs=''):
-    return f'<section class="phead"><div class="wrap">{crumbs}<p class="eyebrow">{eyebrow}</p><h1>{h1}</h1>{f"<p class=sub>{sub}</p>" if sub else ""}</div></section>'
+SVIMG={'office-commercial':'office-team','industrial':'glove-detail','retail':'office-team','healthcare':'glove-detail','post-construction':'glove-detail','schools':'office-team','residential':'residential-vacuum','floor-carpet':'residential-vacuum'}
+def phead(lang,eyebrow,h1,sub='',crumbs='',img=None,btn=''):
+    bg=f'<img class="pbg" src="/assets/{img}.jpg" alt="">' if img else ''
+    return f'<section class="phead{" photo" if img else ""}">{bg}<div class="wrap">{crumbs}<p class="eyebrow">{eyebrow}</p><h1>{h1}</h1>{f"<p class=sub>{sub}</p>" if sub else ""}{btn}</div></section>'
 
 def sv_page(lang,s):
     i=0 if lang=='en' else 1
@@ -147,21 +149,25 @@ def sv_page(lang,s):
     crumbs=f'<p class="crumb"><a href="{u(lang,"home")}">{T[lang]["home"]}</a> / <a href="{u(lang,"services")}">{T[lang]["services"]}</a> / {name}</p>'
     others=''.join(f'<a href="{u(lang,"sv",o)}">{o["n"][i]}</a>' for o in SERVICES if o is not s)
     qlink=u(lang,'contact')+'?service='+s['en']
-    body=f'''{phead(lang,tx("Our services","Nuestros servicios",lang),name,s['s'][i],crumbs)}
-<section class="sec"><div class="wrap sv-g"><div>
-<p style="font-size:18px;color:var(--muted);margin-top:0">{s['intro'][i]}</p>
-<h2 style="font-size:26px;margin-top:34px">{tx("What's included","Qué incluye",lang)}</h2>
-<ul class="list">{''.join(f'<li>{b}</li>' for b in s['b'][i])}</ul>
-<h2 style="font-size:26px;margin:40px 0 18px">{tx("Questions about this service","Preguntas sobre este servicio",lang)}</h2>{faq_html(faq)}
-</div>
-<aside class="side"><h3>{tx("Get a free quote","Pida su cotización gratis",lang)}</h3><p>{tx("Tell us about your space. We reply within one business day.","Cuéntenos sobre su espacio. Respondemos en un día hábil.",lang)}</p><a class="btn btn-g" href="{qlink}">{T[lang]['quote']}</a><p style="margin:16px 0 0;text-align:center">{tx("or call","o llame",lang)} <a href="tel:{TEL}"><strong>{PH}</strong></a></p></aside></div></section>
-<section class="sec alt"><div class="wrap"><h2 style="font-size:26px">{tx("Other services","Otros servicios",lang)}</h2><div class="other">{others}</div></div></section>
+    img=SVIMG[s['en']]
+    hb=f'<div class="btns" style="margin-top:28px"><a class="btn btn-g" href="{qlink}">{T[lang]["quote"]}</a><a class="btn btn-o" href="tel:{TEL}">{PH}</a></div>'
+    cards=''.join(f'<div class="bcard rv"><span class="ck"></span><p>{b}</p></div>' for b in s['b'][i])
+    trust=''.join(f'<div class="tcard rv"><div class="ic">{ic(a)}</div><div><h3>{n}</h3><p>{d}</p></div></div>' for a,n,d in TR[lang])
+    others=''.join(f'<a class="ocard" href="{u(lang,"sv",o)}"><span>{o["n"][i]}</span><i>→</i></a>' for o in SERVICES if o is not s)
+    body=f'''{phead(lang,tx("Our services","Nuestros servicios",lang),name,s['s'][i],crumbs,img,hb)}
+<section class="tband"><div class="wrap tgrid">{trust}</div></section>
+<section class="sec"><div class="wrap split"><div class="rv"><p class="eyebrow">{tx("Overview","Resumen",lang)}</p><h2>{name}</h2><p style="font-size:17px">{s['intro'][i]}</p><a class="btn btn-g" href="{qlink}">{T[lang]['quote']}</a></div>
+<img class="rv" src="/assets/{img}.jpg" alt="{name}" loading="lazy" width="1400" height="788"></div></section>
+<section class="sec alt"><div class="wrap"><p class="eyebrow">{tx("What's included","Qué incluye",lang)}</p><h2>{tx("Everything you need, handled","Todo lo que necesita, resuelto",lang)}</h2><div class="bgrid" style="margin-top:34px">{cards}</div></div></section>
 <section class="sec dark"><div class="wrap"><p class="eyebrow">{tx("How it works","Cómo funciona",lang)}</p><h2>{tx("Our process","Nuestro proceso",lang)}</h2><div class="steps" style="margin-top:34px">{steps(lang)}</div></div></section>
+<section class="sec"><div class="wrap sv-g"><div><p class="eyebrow">FAQ</p><h2 style="margin-bottom:26px">{tx("Questions about this service","Preguntas sobre este servicio",lang)}</h2>{faq_html(faq)}</div>
+<aside class="side"><h3>{tx("Get a free quote","Pida su cotización gratis",lang)}</h3><p>{tx("Tell us about your space. We reply within one business day.","Cuéntenos sobre su espacio. Respondemos en un día hábil.",lang)}</p><a class="btn btn-g" href="{qlink}">{T[lang]['quote']}</a><p style="margin:16px 0 0;text-align:center">{tx("or call","o llame",lang)} <a href="tel:{TEL}"><strong>{PH}</strong></a></p></aside></div></section>
+<section class="sec alt"><div class="wrap"><p class="eyebrow">{tx("Explore","Explore",lang)}</p><h2 style="margin-bottom:30px">{tx("Other services","Otros servicios",lang)}</h2><div class="ogrid">{others}</div></div></section>
 {cta(lang,"Ready to get started?","¿Listo para empezar?","A free quote is one short form away.","Una cotización gratis está a un formulario de distancia.")}'''
     return body,faq_ld(faq)
 
 def services_index(lang):
-    return f'''{phead(lang,tx("Our services","Nuestros servicios",lang),tx("Cleaning services for every property type","Servicios de limpieza para todo tipo de propiedad",lang),tx("We adjust our crews, schedule, and equipment to match the demands of the space — from corporate offices to family homes.","Ajustamos equipos, horarios y equipo de trabajo a las necesidades de cada espacio — desde oficinas corporativas hasta hogares.",lang))}
+    return f'''{phead(lang,tx("Our services","Nuestros servicios",lang),tx("Cleaning services for every property type","Servicios de limpieza para todo tipo de propiedad",lang),tx("We adjust our crews, schedule, and equipment to match the demands of the space — from corporate offices to family homes.","Ajustamos equipos, horarios y equipo de trabajo a las necesidades de cada espacio — desde oficinas corporativas hasta hogares.",lang),'','office-team')}
 <section class="sec"><div class="wrap"><div class="grid">{svc_cards(lang)}</div></div></section>
 <section class="sec dark"><div class="wrap"><p class="eyebrow">{tx("How it works","Cómo funciona",lang)}</p><h2>{tx("Our process","Nuestro proceso",lang)}</h2><div class="steps" style="margin-top:34px">{steps(lang)}</div></div></section>
 {cta(lang,"Not sure which service you need?","¿No sabe qué servicio necesita?","Tell us about your space and we'll recommend a plan and send a free quote.","Cuéntenos sobre su espacio y le recomendamos un plan con cotización gratis.")}'''
@@ -169,7 +175,7 @@ def services_index(lang):
 TR={'en':[('clock','24/7 Availability','Crews ready around the clock, including nights, weekends, and holidays.'),('shield','Trained & Vetted Staff','Every team member is background-checked and trained to our standards before stepping on site.'),('star','Satisfaction Guaranteed',"If a cleaning doesn't meet your standards, we return to make it right.")],
 'es':[('clock','Disponibilidad 24/7','Equipos listos a toda hora, incluyendo noches, fines de semana y días festivos.'),('shield','Personal Capacitado y Verificado','Cada miembro pasa una verificación de antecedentes y es capacitado según nuestros estándares.'),('star','Satisfacción Garantizada','Si una limpieza no cumple con sus estándares, regresamos para corregirlo.')]}
 def about(lang):
-    return f'''{phead(lang,tx("About us","Nosotros",lang),tx("A cleaning company built for consistency","Una empresa de limpieza construida para la consistencia",lang))}
+    return f'''{phead(lang,tx("About us","Nosotros",lang),tx("A cleaning company built for consistency","Una empresa de limpieza construida para la consistencia",lang),'','','glove-detail')}
 <section class="sec"><div class="wrap split"><img class="rv" src="/assets/office-team.jpg" alt="{tx("United Cleaning Services team at work in a corporate lobby","Equipo de United Cleaning Services trabajando en un lobby corporativo",lang)}" width="1400" height="788">
 <div class="rv"><p style="font-size:17px">{tx("United Cleaning Services provides commercial and residential cleaning across Missouri, Kansas &amp; Southern Illinois. We work with offices, industrial facilities, retail stores, healthcare spaces, schools, and homes — adjusting our approach to the demands of each type of property.","United Cleaning Services ofrece limpieza comercial y residencial en Missouri, Kansas y el sur de Illinois. Trabajamos con oficinas, instalaciones industriales, tiendas, centros de salud, escuelas y hogares, adaptando nuestro enfoque a cada tipo de propiedad.",lang)}</p>
 <p style="font-size:17px">{tx("Every technician is background-checked and trained to a consistent cleaning standard before being assigned to a job. Crews are available around the clock, and if a cleaning doesn't meet your standards, we return to make it right.","Cada técnico pasa una verificación de antecedentes y es capacitado bajo un estándar consistente antes de ser asignado. Los equipos están disponibles a toda hora y, si una limpieza no cumple sus estándares, regresamos para corregirla.",lang)}</p></div></div></section>

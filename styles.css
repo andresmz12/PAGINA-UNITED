@@ -184,3 +184,25 @@ a.card .go{display:inline-block;margin-top:14px;font-weight:600;font-size:14px;c
 .lang svg,.flag svg{width:30px;height:20px;border-radius:4px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.35);transition:.2s}
 .lang:hover svg{transform:scale(1.1);box-shadow:0 0 0 2px var(--cyan)}
 .flag{display:inline-flex;line-height:0}
+
+.phead.photo{position:relative;overflow:hidden;padding:84px 0 80px}
+.phead .pbg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.phead.photo:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(15,29,47,.95) 0,rgba(15,29,47,.8) 50%,rgba(15,29,47,.45) 100%)}
+.phead .wrap{position:relative;z-index:2}
+.phead .btns{display:flex;gap:14px;flex-wrap:wrap}
+.tband{background:#fff;border-bottom:1px solid var(--line)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px;padding-top:30px;padding-bottom:30px}
+.tcard{display:flex;gap:14px;align-items:flex-start}
+.tcard .ic{flex:none;width:46px;height:46px;border-radius:12px;background:#e7f4f4;color:var(--teal);display:grid;place-items:center}
+.tcard h3{font-size:15.5px;margin-bottom:3px}.tcard p{margin:0;font-size:13.5px;color:var(--muted);line-height:1.45}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.bcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;gap:14px;align-items:flex-start;transition:.2s}
+.bcard:hover{transform:translateY(-3px);box-shadow:0 14px 30px -18px rgba(15,29,47,.35);border-color:#c5d3df}
+.bcard p{margin:0;font-weight:600;font-size:16px;line-height:1.4}
+.ck{flex:none;width:26px;height:26px;border-radius:50%;background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.5l2.4 2.3 4.6-5' stroke='%2305202a' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.ocard{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;font-weight:600;color:var(--ink);transition:.2s}
+.ocard i{font-style:normal;color:var(--teal);transition:.2s}
+.ocard:hover{border-color:var(--teal);color:var(--teal)}.ocard:hover i{transform:translateX(4px)}
+.cta{position:relative}
+.dark .step{background:var(--navy2)}
