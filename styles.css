@@ -180,3 +180,7 @@ a.card .go{display:inline-block;margin-top:14px;font-weight:600;font-size:14px;c
 .sv-g{grid-template-columns:minmax(0,1fr)}.side{position:static}
 .wa{bottom:84px;right:14px;width:50px;height:50px}}
 @media(prefers-reduced-motion:reduce){.slide{transition:none}}
+.lang{display:flex!important;align-items:center;padding:0!important;border:0!important;line-height:0}
+.lang svg,.flag svg{width:30px;height:20px;border-radius:4px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.35);transition:.2s}
+.lang:hover svg{transform:scale(1.1);box-shadow:0 0 0 2px var(--cyan)}
+.flag{display:inline-flex;line-height:0}

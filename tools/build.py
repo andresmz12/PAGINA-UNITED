@@ -33,6 +33,9 @@ def ic(n):
 WA_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.900-.2-.3A8.200 8.200 0 1112 20.200zm4.500-6.100c-.2-.1-1.500-.7-1.700-.8s-.4-.1-.6.100-.6.800-.8 1-.3.200-.6.100a6.700 6.700 0 01-3.300-2.900c-.2-.4.200-.4.700-1.300.1-.2 0-.3 0-.5l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 00-.7.300 3 3 0 00-.9 2.200c0 1.300.9 2.600 1 2.800.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.7 3.100.6.500-.1 1.500-.6 1.700-1.200s.2-1.100.2-1.200-.2-.2-.5-.3z"/></svg>'
 
 THEMEV=hashlib.md5(open(f'{ROOT}/theme.css','rb').read()).hexdigest()[:8]
+FLAGS={
+'es':'<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#c60b1e"/><rect y="5" width="30" height="10" fill="#ffc400"/></svg>',
+'en':'<svg viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/>'+''.join(f'<rect y="{y*20/7.0:.2f}" width="30" height="{20/13.0:.2f}" fill="#b22234"/>' for y in [0,1.9,3.8,5.7,7.6,9.5,11.4] if False)+''.join(f'<rect y="{k*20/13:.2f}" width="30" height="{20/13:.2f}" fill="#b22234"/>' for k in range(0,13,2))+'<rect width="13" height="10.77" fill="#3c3b6e"/></svg>'}
 def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jpg'):
     t=T[lang]; url=BASE+path
     sv_links=''.join(f'<li><a href="{u(lang,"sv",s)}">{L(lang,s["n"])}</a></li>' for s in SERVICES)
@@ -62,7 +65,7 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
 <body>
 <header class="top"><div class="wrap nav">
 <a class="brand" href="{home}"><img src="/assets/logo.jpg" alt="{C['name']} logo" width="44" height="44"><span>UNITED<small>CLEANING SERVICES</small></span></a>
-<nav class="menu" id="menu" aria-label="Main">{nav}<a class="lang" href="{alt}" hreflang="{'es' if lang=='en' else 'en'}" title="{t['olabel']}">{t['other']}</a></nav>
+<nav class="menu" id="menu" aria-label="Main">{nav}<a class="lang" href="{alt}" hreflang="{'es' if lang=='en' else 'en'}" title="{t['olabel']}" aria-label="{t['olabel']}">{FLAGS['es' if lang=='en' else 'en']}</a></nav>
 <div class="nav-cta"><a class="tel" href="tel:{TEL}">{PH}</a><a class="btn btn-g" href="{q}">{t['quote']}</a><button class="burger" aria-label="Menu" aria-expanded="false" aria-controls="menu"><span></span><span></span><span></span></button></div>
 </div></header>
 <main>{body}</main>
@@ -73,7 +76,7 @@ def page(lang,path,alt,title,desc,body,ld_extra='',ogimg='/assets/office-team.jp
 <div><h4>{t['svc']}</h4>{''.join(f'<a href="{u(lang,"sv",s)}">{L(lang,s["n"])}</a>' for s in SERVICES)}</div>
 <div><h4>{t['ct']}</h4><a href="tel:{TEL}">{PH}</a><a href="mailto:{EM}">{EM}</a><span>{t['avail']}</span><span>{t['area']}</span></div>
 </div>
-<div class="fb"><span>{t['rights']}</span><a href="{alt}" style="color:#7f93a8">{t['olabel']}</a></div>
+<div class="fb"><span>{t['rights']}</span><a href="{alt}" style="color:#7f93a8;display:flex;align-items:center;gap:8px"><span class="flag">{FLAGS['es' if lang=='en' else 'en']}</span>{t['olabel']}</a></div>
 </div></footer>
 <a class="wa" href="https://wa.me/{WA}" target="_blank" rel="noopener" aria-label="{t['wa']}">{WA_SVG}</a>
 <div class="mbar"><a class="c" href="tel:{TEL}">{t['call']}</a><a class="q" href="{q}">{t['q_s']}</a></div>
